@@ -5,7 +5,7 @@
 注意力是如何应用于视觉世界中的呢？
 这要从当今十分普及的*双组件*（two-component）的框架开始讲起：
 这个框架的出现可以追溯到19世纪90年代的威廉·詹姆斯，
-他被认为是“美国心理学之父” :cite:`James.2007`。
+他被认为是“美国心理学之父” 。
 在这个框架中，受试者基于*非自主性提示*和*自主性提示*
 有选择地引导注意力的焦点。
 
@@ -60,7 +60,7 @@
 因此这个框架下的模型将成为本章的中心。
 然而，注意力机制的设计有许多替代方案。
 例如可以设计一个不可微的注意力模型，
-该模型可以使用强化学习方法 :cite:`Mnih.Heess.Graves.ea.2014`进行训练。
+该模型可以使用强化学习方法进行训练。
 
 ## 注意力的可视化
 
@@ -84,14 +84,14 @@ $$f(x) = \frac{1}{n}\sum_{i=1}^n y_i,$$
 
 ## [**非参数注意力汇聚**]
 
-显然，平均汇聚忽略了输入$x_i$。
+显然，平均汇聚忽略了输入 $x_i$ 。
 于是Nadaraya和
 Watson提出了一个更好的想法，
-根据输入的位置对输出$y_i$进行加权：
+根据输入的位置对输出 $y_i$ 进行加权：
 
 $$f(x) = \sum_{i=1}^n \frac{K(x - x_i)}{\sum_{j=1}^n K(x - x_j)} y_i,$$
 
-其中$K$是*核*（kernel）。
+其中 $K$ 是*核*（kernel）。
 该公式所描述的估计器被称为
 *Nadaraya-Watson核回归*。
 这里不会深入讨论核函数的细节，
@@ -101,12 +101,12 @@ $$f(x) = \sum_{i=1}^n \frac{K(x - x_i)}{\sum_{j=1}^n K(x - x_j)} y_i,$$
 
 $$f(x) = \sum_{i=1}^n \alpha(x, x_i) y_i,$$
 
-其中$x$是查询，$(x_i, y_i)$是键值对。
+其中 $x$ 是查询， $(x_i, y_i)$ 是键值对。
 比较这两个注意力汇聚公式，
-注意力汇聚是$y_i$的加权平均。
-将查询$x$和键$x_i$之间的关系建模为
-*注意力权重*（attention weight）$\alpha(x, x_i)$，
-这个权重将被分配给每一个对应值$y_i$。
+注意力汇聚是 $y_i$ 的加权平均。
+将查询$x$和键 $x_i$ 之间的关系建模为
+*注意力权重*（attention weight）$\alpha(x, x_i)$ ，
+这个权重将被分配给每一个对应值 $y_i$ 。
 对于任何查询，模型在所有键值对注意力权重都是一个有效的概率分布：
 它们是非负的，并且总和为1。
 
@@ -115,14 +115,13 @@ $$f(x) = \sum_{i=1}^n \alpha(x, x_i) y_i,$$
 
 $$K(u) = \frac{1}{\sqrt{2\pi}} \exp(-\frac{u^2}{2}).$$
 
-将高斯核代入 :eqref:`eq_attn-pooling`和
- :eqref:`eq_nadaraya-watson`可以得到：
+将高斯核代入可以得到：
 
 $$\begin{aligned} f(x) &=\sum_{i=1}^n \alpha(x, x_i) y_i\\ &= \sum_{i=1}^n \frac{\exp\left(-\frac{1}{2}(x - x_i)^2\right)}{\sum_{j=1}^n \exp\left(-\frac{1}{2}(x - x_j)^2\right)} y_i \\&= \sum_{i=1}^n \mathrm{softmax}\left(-\frac{1}{2}(x - x_i)^2\right) y_i. \end{aligned}$$
 
 在这个公式中，
-如果一个键$x_i$越是接近给定的查询$x$，
-那么分配给这个键对应值$y_i$的注意力权重就会越大，
+如果一个键 $x_i$ 越是接近给定的查询 $x$ ，
+那么分配给这个键对应值 $y_i$ 的注意力权重就会越大，
 也就“获得了更多的注意力”。
 
 值得注意的是，Nadaraya-Watson核回归是一个非参数模型。
@@ -134,7 +133,7 @@ $$\begin{aligned} f(x) &=\sum_{i=1}^n \alpha(x, x_i) y_i\\ &= \sum_{i=1}^n \frac
 如果有足够的数据，此模型会收敛到最优结果。
 尽管如此，我们还是可以轻松地将可学习的参数集成到注意力汇聚中。
 
-在下面的查询$x$和键$x_i$之间的距离乘以可学习参数$w$：
+在下面的查询 $x$ 和键 $x_i$ 之间的距离乘以可学习参数 $w$ ：
 
 $$\begin{aligned}f(x) &= \sum_{i=1}^n \alpha(x, x_i) y_i \\&= \sum_{i=1}^n \frac{\exp\left(-\frac{1}{2}((x - x_i)w)^2\right)}{\sum_{j=1}^n \exp\left(-\frac{1}{2}((x - x_j)w)^2\right)} y_i \\&= \sum_{i=1}^n \mathrm{softmax}\left(-\frac{1}{2}((x - x_i)w)^2\right) y_i.\end{aligned}$$
 
@@ -143,15 +142,15 @@ $$\begin{aligned}f(x) &= \sum_{i=1}^n \alpha(x, x_i) y_i \\&= \sum_{i=1}^n \frac
 为了更有效地计算小批量数据的注意力，
 我们可以利用深度学习开发框架中提供的批量矩阵乘法。
 
-假设第一个小批量数据包含$n$个矩阵$\mathbf{X}_1,\ldots, \mathbf{X}_n$，
-形状为$a\times b$，
-第二个小批量包含$n$个矩阵$\mathbf{Y}_1, \ldots, \mathbf{Y}_n$，
-形状为$b\times c$。
-它们的批量矩阵乘法得到$n$个矩阵
-$\mathbf{X}_1\mathbf{Y}_1, \ldots, \mathbf{X}_n\mathbf{Y}_n$，
-形状为$a\times c$。
-因此，[**假定两个张量的形状分别是$(n,a,b)$和$(n,b,c)$，
-它们的批量矩阵乘法输出的形状为$(n,a,c)$**]。
+假设第一个小批量数据包含 $n$ 个矩阵 $\mathbf{X}_1,\ldots, \mathbf{X}_n$ ，
+形状为 $a\times b$ ，
+第二个小批量包含 $n$ 个矩阵 $\mathbf{Y}_1, \ldots, \mathbf{Y}_n$ ，
+形状为 $b\times c$ 。
+它们的批量矩阵乘法得到 $n$ 个矩阵
+ $\mathbf{X}_1\mathbf{Y}_1, \ldots, \mathbf{X}_n\mathbf{Y}_n$，
+形状为 $a\times c$ 。
+因此，[**假定两个张量的形状分别是 $(n,a,b)$ 和 $(n,b,c)$ ，
+它们的批量矩阵乘法输出的形状为 $(n,a,c)$ **]。
 
 # 注意力评分函数
 
@@ -173,21 +172,21 @@ $\mathbf{X}_1\mathbf{Y}_1, \ldots, \mathbf{X}_n\mathbf{Y}_n$，
 ![计算注意力汇聚的输出为值的加权和](../img/attention-output.svg)
 
 用数学语言描述，假设有一个查询
-$\mathbf{q} \in \mathbb{R}^q$和
-$m$个“键－值”对
+$\mathbf{q} \in \mathbb{R}^q$ 和
+$m$ 个“键－值”对
 $(\mathbf{k}_1, \mathbf{v}_1), \ldots, (\mathbf{k}_m, \mathbf{v}_m)$，
-其中$\mathbf{k}_i \in \mathbb{R}^k$，$\mathbf{v}_i \in \mathbb{R}^v$。
-注意力汇聚函数$f$就被表示成值的加权和：
+其中 $\mathbf{k}_i \in \mathbb{R}^k$，$\mathbf{v}_i \in \mathbb{R}^v$。
+注意力汇聚函数 $f$ 就被表示成值的加权和：
 
 $$f(\mathbf{q}, (\mathbf{k}_1, \mathbf{v}_1), \ldots, (\mathbf{k}_m, \mathbf{v}_m)) = \sum_{i=1}^m \alpha(\mathbf{q}, \mathbf{k}_i) \mathbf{v}_i \in \mathbb{R}^v,$$
 
-其中查询$\mathbf{q}$和键$\mathbf{k}_i$的注意力权重（标量）
-是通过注意力评分函数$a$将两个向量映射成标量，
+其中查询 $\mathbf{q}$ 和键 $\mathbf{k}_i$ 的注意力权重（标量）
+是通过注意力评分函数 $a$ 将两个向量映射成标量，
 再经过softmax运算得到的：
 
 $$\alpha(\mathbf{q}, \mathbf{k}_i) = \mathrm{softmax}(a(\mathbf{q}, \mathbf{k}_i)) = \frac{\exp(a(\mathbf{q}, \mathbf{k}_i))}{\sum_{j=1}^m \exp(a(\mathbf{q}, \mathbf{k}_j))} \in \mathbb{R}.$$
-
-正如上图所示，选择不同的注意力评分函数$a$会导致不同的注意力汇聚操作。
+ 
+正如上图所示，选择不同的注意力评分函数 $a$ 会导致不同的注意力汇聚操作。
 这里将介绍两个流行的评分函数，稍后将用他们来实现更复杂的注意力机制。
 
 ## [**掩蔽softmax操作**]
@@ -204,9 +203,9 @@ $$\alpha(\mathbf{q}, \mathbf{k}_i) = \mathrm{softmax}(a(\mathbf{q}, \mathbf{k}_i
 其中任何超出有效长度的位置都被掩蔽并置为0。
 
 为了[**演示此函数是如何工作**]的，
-考虑由$2 \times 2 \times 4$张量表示的样本，
-有效长度为$[2,3]$
-可以理解为$[[2,2],[3,3]]$
+考虑由 $2 \times 2 \times 4$ 张量表示的样本，
+有效长度为 $[2,3]$
+可以理解为 $[[2,2],[3,3]]$
 经过掩蔽softmax操作，超出有效长度的值都被掩蔽为0。
 
 掩蔽后张量：
@@ -219,7 +218,7 @@ $$\alpha(\mathbf{q}, \mathbf{k}_i) = \mathrm{softmax}(a(\mathbf{q}, \mathbf{k}_i
 
 同样，也可以使用二维张量，为矩阵样本中的每一行指定有效长度。
 
-若有效长度为$[[1,3],[2,4]]$, 那么掩蔽后张量：
+若有效长度为 $[[1,3],[2,4]]$ , 那么掩蔽后张量：
 
     [[[1.        , 0.        , 0.        , 0.        ],
     [0.35848376, 0.36588794, 0.2756283 , 0.        ]],
@@ -231,25 +230,25 @@ $$\alpha(\mathbf{q}, \mathbf{k}_i) = \mathrm{softmax}(a(\mathbf{q}, \mathbf{k}_i
 ## [**加性注意力**]
 
 一般来说，当查询和键是不同长度的矢量时，可以使用加性注意力作为评分函数。
-给定查询$\mathbf{q} \in \mathbb{R}^q$和
-键$\mathbf{k} \in \mathbb{R}^k$，
+给定查询 $\mathbf{q} \in \mathbb{R}^q$ 和
+键 $\mathbf{k} \in \mathbb{R}^k$ ，
 *加性注意力*（additive attention）的评分函数为
 
 $$a(\mathbf q, \mathbf k) = \mathbf w_v^\top \text{tanh}(\mathbf W_q\mathbf q + \mathbf W_k \mathbf k) \in \mathbb{R},$$
 
-其中可学习的参数是$\mathbf W_q\in\mathbb R^{h\times q}$、
-$\mathbf W_k\in\mathbb R^{h\times k}$和
-$\mathbf w_v\in\mathbb R^{h}$。
+其中可学习的参数是 $\mathbf W_q\in\mathbb R^{h\times q}$ 、
+ $\mathbf W_k\in\mathbb R^{h\times k}$ 和
+$\mathbf w_v\in\mathbb R^{h}$ 。
 如公式所示，
 将查询和键连结起来后输入到一个多层感知机（MLP）中，
-感知机包含一个隐藏层，其隐藏单元数是一个超参数$h$。
-通过使用$\tanh$作为激活函数。
+感知机包含一个隐藏层，其隐藏单元数是一个超参数 $h$ 。
+通过使用 $\tanh$ 作为激活函数。
 
 ### 参数维度设置
 
 在NLP(Natural Language Processing)中，
-查询数小于等于第$i$个词元序列长度，且大于0，
-而键$k_i$和值$v_i$数量通常就是第$i$个词元序列长度或者就是步数。
+查询数小于等于第 $i$ 个词元序列长度，且大于0，
+而键 $k_i$ 和值 $v_i$ 数量通常就是第 $i$ 个词元序列长度或者就是步数。
 
 假设我们有一个序列 ["I", "love", "deep", "learning"]，
 你可能会只对词 "love" 提出查询。
@@ -272,17 +271,17 @@ $W_q$: 一个线性层，输入维度是feature_q，输出维度是num_hidden,�
 
 （此处的num_hidden代表的是query和key加和所使用的维度，由于最终注意力分数为标量，所以num_hidden是一个超参数，就像是被隐藏在这过程中）
 
-剩下的$W_k$与$w_v$同$W_q$有异曲同工之妙。
+剩下的 $W_k$ 与 $w_v$ 同 $W_q$ 有异曲同工之妙。
 
 $W_k$: 一个线性层，输入维度是feature_k，输出维度是num_hidden
 
 $w_v$: 一个线性层，输入维度是num_hidden，输出维度是1 (该层与value并无直接联系，故小写w)
 
-随后可以计算$a(\mathbf q, \mathbf k) = \mathbf w_v^\top \text{tanh}(\mathbf W_q\mathbf q + \mathbf W_k \mathbf k) \in \mathbb{R},$得到注意力分数，此时注意力分数张量是(batch_size, num_q, num_k&v, 1), 最后一个维度可以去除，即张量为(batch_size, num_q, num_k&v)
+随后可以计算 $a(\mathbf q, \mathbf k) = \mathbf w_v^\top \text{tanh}(\mathbf W_q\mathbf q + \mathbf W_k \mathbf k) \in \mathbb{R},$ 得到注意力分数，此时注意力分数张量是(batch_size, num_q, num_k&v, 1), 最后一个维度可以去除，即张量为(batch_size, num_q, num_k&v)
 
 ### 对注意力分数进行masked_softmax
 
-**valid_lens**可以是一个$1 \times $batch_size的向量，
+**valid_lens**可以是一个 $1 \times$ batch_size的向量，
 用于掩蔽掉一些注意力分数。
 
 掩蔽之后对于各个注意力分数做softmax,使它们变成概率。
@@ -291,30 +290,23 @@ $w_v$: 一个线性层，输入维度是num_hidden，输出维度是1 (该层与
 
 $$f(\mathbf{q}, (\mathbf{k}_1, \mathbf{v}_1), \ldots, (\mathbf{k}_m, \mathbf{v}_m)) = \sum_{i=1}^m \alpha(\mathbf{q}, \mathbf{k}_i) \mathbf{v}_i \in \mathbb{R}^v,$$
 
-对于每一个批次，做value的加权求和，其中可以对某些注意力权重，也就是$\alpha(\mathbf{q}, \mathbf{k}_i)$做暂退法dropout（把一些注意力权重设置成0）。
+对于每一个批次，做value的加权求和，其中可以对某些注意力权重，也就是 $\alpha(\mathbf{q}, \mathbf{k}_i)$ 做暂退法dropout（把一些注意力权重设置成0）。
 
 dropout是一种正则化技术，该技术的主要作用是防止神经网络的过拟合。
 
-为了保证 Dropout **不会改变整体输出的期望**，我们在训练时除以 $ p $ 进行缩放：
-$$
-\tilde{x} = \frac{x \cdot \mathbf{m}}{p}
-$$
+为了保证 Dropout **不会改变整体输出的期望**，我们在训练时除以 $p$ 进行缩放： $$\tilde{x} = \frac{x \cdot \mathbf{m}}{p}$$
 其中：
-- $ \mathbf{m} $ 是一个随机变量，满足：
-  $$
-  \mathbf{m} =
-  \begin{cases}
-  1, & \text{概率 } p \\
-  0, & \text{概率 } 1 - p
-  \end{cases}
-  $$
+
+  $\mathbf{m}$ 是一个随机变量，满足：
+  $$\mathbf{m} =  \begin{cases}  1, & \text{概率 }  \\  0, & \text{概率 } 1 - p  \end{cases}$$
 
 这样，我们计算缩放后的期望：
-$$
-\mathbb{E}[\tilde{x}] = \mathbb{E} \left[ \frac{x \cdot \mathbf{m}}{p} \right]
+
+$$\mathbb{E}[\tilde{x}] = \mathbb{E} \left[ \frac{x \cdot \mathbf{m}}{p} \right]
 $$
 
-因为 **期望可以分配到乘法内**，并且 $\mathbb{E}[\mathbf{m}] = p$，所以：
+因为 **期望可以分配到乘法内**，并且 $\mathbb{E}[\mathbf{m}] = p$ ，所以：
+
 $$
 \mathbb{E}[\tilde{x}] = \frac{x}{p} \cdot \mathbb{E}[\mathbf{m}] = \frac{x}{p} \cdot p = x
 $$
@@ -343,7 +335,7 @@ valid_lens: tensor([2, 6])
 在计算过程中的超参数：
 num_hiddens=8, dropout=0.1
 
-计算得出结果是一个$2 \times 1 \times 4$的张量：
+计算得出结果是一个 $2 \times 1 \times 4$ 的张量：
 
     [[[ 2.0000,  3.0000,  4.0000,  5.0000]],
 
@@ -359,13 +351,13 @@ queries & keys 热力图：
 ## [**缩放点积注意力**]
 
 使用点积可以得到计算效率更高的评分函数，
-但是点积操作要求查询和键具有相同的长度$d$。
+但是点积操作要求查询和键具有相同的长度 $d$ 。
 假设查询和键的所有元素都是独立的随机变量，
 并且都满足零均值和单位方差，
-那么两个向量的点积的均值为$0$，方差为$d$。
+那么两个向量的点积的均值为 $0$ ，方差为 $d$ 。
 为确保无论向量长度如何，
 点积的方差在不考虑向量长度的情况下仍然是$1$，
-我们再将点积除以$\sqrt{d}$，
+我们再将点积除以 $\sqrt{d}$ ，
 则*缩放点积注意力*（scaled dot-product attention）评分函数为：
 
 $$a(\mathbf q, \mathbf k) = \mathbf{q}^\top \mathbf{k}  /\sqrt{d}.$$
@@ -471,7 +463,7 @@ query是目标语言的一个词元，
 $\mathbf{P} \in \mathbb{R}^{n \times d}$输出$\mathbf{X} + \mathbf{P}$，
 矩阵第$i$行、第$2j$列和$2j+1$列上的元素为：
 
-$$\begin{aligned} p_{i, 2j} &= \sin\left(\frac{i}{10000^{2j/d}}\right),\\p_{i, 2j+1} &= \cos\left(\frac{i}{10000^{2j/d}}\right).\end{aligned}$$
+$$\begin{aligned} p_{i, 2j} &= \sin\left(\frac{i}{10000^{2j/d}}\right),p_{i, 2j+1} &= \cos\left(\frac{i}{10000^{2j/d}}\right).\end{aligned}$$
 
 ### 绝对位置信息
 
