@@ -105,7 +105,7 @@ $$f(x) = \sum_{i=1}^n \alpha(x, x_i) y_i,$$
 比较这两个注意力汇聚公式，
 注意力汇聚是 $y_i$ 的加权平均。
 将查询 $x$ 和键 $x_i$ 之间的关系建模为
-*注意力权重*（attention weight）$\alpha(x,x_{i})$ ，
+*注意力权重*（attention weight）$\alpha(x,x_i)$ ，
 这个权重将被分配给每一个对应值 $y_i$ 。
 对于任何查询，模型在所有键值对注意力权重都是一个有效的概率分布：
 它们是非负的，并且总和为1。
@@ -489,7 +489,12 @@ $\mathbf{P} \in \mathbb{R}^{n \times d}$ 输出
 $\mathbf{X} + \mathbf{P}$ ，
 矩阵第 $i$ 行、第 $2j$ 列和 $2j+1$ 列上的元素为：
 
-$$\begin{aligned} p_{i, 2j} &= \sin\left(\frac{i}{10000^{2j/d}}\right),p_{i, 2j+1} &= \cos\left(\frac{i}{10000^{2j/d}}\right).\end{aligned}$$
+$$
+\begin{aligned}
+p_{i, 2j} &= \sin\left(\frac{i}{10000^{2j/d}}\right), \\
+p_{i, 2j+1} &= \cos\left(\frac{i}{10000^{2j/d}}\right).
+\end{aligned}
+$$
 
 ### 绝对位置信息
 
