@@ -71,7 +71,7 @@
 下面使用一个简单的例子进行演示。
 在本例子中，仅当查询和键相同时，注意力权重为1，否则为0。
 
-figure TBD
+![heatmap](../img/output_attention-cues_054b1a_33_1.svg)
 
 # 注意力汇聚：Nadaraya-Watson 核回归
 
@@ -117,7 +117,7 @@ $$K(u) = \frac{1}{\sqrt{2\pi}} \exp(-\frac{u^2}{2}).$$
 
 将高斯核代入可以得到：
 
-$$\begin{aligned} f(x) &=\sum_{i=1}^n \alpha(x, x_i) y_i\\ &= \sum_{i=1}^n \frac{\exp\left(-\frac{1}{2}(x - x_i)^2\right)}{\sum_{j=1}^n \exp\left(-\frac{1}{2}(x - x_j)^2\right)} y_i \\&= \sum_{i=1}^n \mathrm{softmax}\left(-\frac{1}{2}(x - x_i)^2\right) y_i. \end{aligned}$$
+$$\begin{aligned} f(x) &=\sum_{i=1}^n \alpha(x, x_i) y_i\\ &= \sum_{i=1}^n \frac{\exp\left(-\frac{1}{2}(x - x_i)^2\right)}{\sum_{j=1}^n \exp\left(-\frac{1}{2}(x - x_j)^2\right)} y_i \\ &= \sum_{i=1}^n \mathrm{softmax}\left(-\frac{1}{2}(x - x_i)^2\right) y_i. \end{aligned}$$
 
 在这个公式中，
 如果一个键 $x_i$ 越是接近给定的查询 $x$ ，
@@ -135,7 +135,7 @@ $$\begin{aligned} f(x) &=\sum_{i=1}^n \alpha(x, x_i) y_i\\ &= \sum_{i=1}^n \frac
 
 在下面的查询 $x$ 和键 $x_i$ 之间的距离乘以可学习参数 $w$ ：
 
-$$\begin{aligned}f(x) &= \sum_{i=1}^n \alpha(x, x_i) y_i \\&= \sum_{i=1}^n \frac{\exp\left(-\frac{1}{2}((x - x_i)w)^2\right)}{\sum_{j=1}^n \exp\left(-\frac{1}{2}((x - x_j)w)^2\right)} y_i \\&= \sum_{i=1}^n \mathrm{softmax}\left(-\frac{1}{2}((x - x_i)w)^2\right) y_i.\end{aligned}$$
+$$\begin{aligned}f(x) &= \sum_{i=1}^n \alpha(x, x_i) y_i \\ &= \sum_{i=1}^n \frac{\exp\left(-\frac{1}{2}((x - x_i)w)^2\right)}{\sum_{j=1}^n \exp\left(-\frac{1}{2}((x - x_j)w)^2\right)} y_i \\ &= \sum_{i=1}^n \mathrm{softmax}\left(-\frac{1}{2}((x - x_i)w)^2\right) y_i.\end{aligned}$$
 
 ### 批量矩阵乘法
 
@@ -165,7 +165,7 @@ $$\begin{aligned}f(x) &= \sum_{i=1}^n \alpha(x, x_i) y_i \\&= \sum_{i=1}^n \frac
 注意力机制框架。
 下图说明了
 如何将注意力汇聚的输出计算成为值的加权和，
-其中$a$表示注意力评分函数。
+其中 $a$ 表示注意力评分函数。
 由于注意力权重是概率分布，
 因此加权和其本质上是加权平均值。
 
@@ -175,16 +175,27 @@ $$\begin{aligned}f(x) &= \sum_{i=1}^n \alpha(x, x_i) y_i \\&= \sum_{i=1}^n \frac
 $\mathbf{q} \in \mathbb{R}^q$ 和
 $m$ 个“键－值”对
 $(\mathbf{k}_1, \mathbf{v}_1), \ldots, (\mathbf{k}_m, \mathbf{v}_m)$，
-其中 $\mathbf{k}_i \in \mathbb{R}^k$，$\mathbf{v}_i \in \mathbb{R}^v$。
-注意力汇聚函数 $f$ 就被表示成值的加权和：
+其中 $\mathbf{k}_i \in \mathbb{R}^k$ , $\mathbf{v}_i \in \mathbb{R}^v$ 。 注意力汇聚函数 $f$ 就被表示成值的加权和：
 
-$$f(\mathbf{q}, (\mathbf{k}_1, \mathbf{v}_1), \ldots, (\mathbf{k}_m, \mathbf{v}_m)) = \sum_{i=1}^m \alpha(\mathbf{q}, \mathbf{k}_i) \mathbf{v}_i \in \mathbb{R}^v,$$
+$$
+f(\mathbf{q}, (\mathbf{k}_1, \mathbf{v}_1), \ldots, (\mathbf{k}_m, \mathbf{v}_m)) = \sum_{i=1}^m \alpha(\mathbf{q}, \mathbf{k}_i) \mathbf{v}_i
+$$
+$$
+\text{where the output lies in } \mathbb{R}^v
+$$
+
 
 其中查询 $\mathbf{q}$ 和键 $\mathbf{k}_i$ 的注意力权重（标量）
 是通过注意力评分函数 $a$ 将两个向量映射成标量，
 再经过softmax运算得到的：
 
-$$\alpha(\mathbf{q}, \mathbf{k}_i) = \mathrm{softmax}(a(\mathbf{q}, \mathbf{k}_i)) = \frac{\exp(a(\mathbf{q}, \mathbf{k}_i))}{\sum_{j=1}^m \exp(a(\mathbf{q}, \mathbf{k}_j))} \in \mathbb{R}.$$
+$$
+\alpha(\mathbf{q}, \mathbf{k}_i) = \mathrm{softmax}(a(\mathbf{q}, \mathbf{k}_i)) = \frac{\exp(a(\mathbf{q}, \mathbf{k}_i))}{\sum_{j=1}^m \exp(a(\mathbf{q}, \mathbf{k}_j))}
+$$
+$$
+\text{where } \alpha(\mathbf{q}, \mathbf{k}_i) \in \mathbb{R}
+$$
+
  
 正如上图所示，选择不同的注意力评分函数 $a$ 会导致不同的注意力汇聚操作。
 这里将介绍两个流行的评分函数，稍后将用他们来实现更复杂的注意力机制。
@@ -234,7 +245,11 @@ $$\alpha(\mathbf{q}, \mathbf{k}_i) = \mathrm{softmax}(a(\mathbf{q}, \mathbf{k}_i
 键 $\mathbf{k} \in \mathbb{R}^k$ ，
 *加性注意力*（additive attention）的评分函数为
 
-$$a(\mathbf q, \mathbf k) = \mathbf w_v^\top \text{tanh}(\mathbf W_q\mathbf q + \mathbf W_k \mathbf k) \in \mathbb{R},$$
+$$
+a(\mathbf{q}, \mathbf{k}) = \mathbf{w}_v^\top \text{tanh}(\mathbf{W}_q \mathbf{q} + \mathbf{W}_k \mathbf{k})  \text{where } a(\mathbf{q}, \mathbf{k}) \in \mathbb{R}
+$$
+
+
 
 其中可学习的参数是 $\mathbf W_q\in\mathbb R^{h\times q}$ 、
  $\mathbf W_k\in\mathbb R^{h\times k}$ 和
@@ -277,7 +292,7 @@ $W_k$: 一个线性层，输入维度是feature_k，输出维度是num_hidden
 
 $w_v$: 一个线性层，输入维度是num_hidden，输出维度是1 (该层与value并无直接联系，故小写w)
 
-随后可以计算 $a(\mathbf q, \mathbf k) = \mathbf w_v^\top \text{tanh}(\mathbf W_q\mathbf q + \mathbf W_k \mathbf k) \in \mathbb{R},$ 得到注意力分数，此时注意力分数张量是(batch_size, num_q, num_k&v, 1), 最后一个维度可以去除，即张量为(batch_size, num_q, num_k&v)
+随后可以计算 $a(\mathbf q, \mathbf k) = \mathbf w_v^\top \text{tanh}(\mathbf W_q\mathbf q + \mathbf W_k \mathbf k) \text{, where }a(\mathbf q, \mathbf k)\in \mathbb{R},$ 得到注意力分数，此时注意力分数张量是(batch_size, num_q, num_k&v, 1), 最后一个维度可以去除，即张量为(batch_size, num_q, num_k&v)
 
 ### 对注意力分数进行masked_softmax
 
@@ -288,7 +303,10 @@ $w_v$: 一个线性层，输入维度是num_hidden，输出维度是1 (该层与
 
 ### 计算注意力汇聚函数
 
-$$f(\mathbf{q}, (\mathbf{k}_1, \mathbf{v}_1), \ldots, (\mathbf{k}_m, \mathbf{v}_m)) = \sum_{i=1}^m \alpha(\mathbf{q}, \mathbf{k}_i) \mathbf{v}_i \in \mathbb{R}^v,$$
+$$
+f(\mathbf{q}, (\mathbf{k}_1, \mathbf{v}_1), \ldots, (\mathbf{k}_m, \mathbf{v}_m)) = \sum_{i=1}^m \alpha(\mathbf{q}, \mathbf{k}_i) \mathbf{v}_i \quad \text{where} \quad \mathbf{v}_i \in \mathbb{R}^v
+$$
+
 
 对于每一个批次，做value的加权求和，其中可以对某些注意力权重，也就是 $\alpha(\mathbf{q}, \mathbf{k}_i)$ 做暂退法dropout（把一些注意力权重设置成0）。
 
@@ -363,11 +381,11 @@ queries & keys 热力图：
 $$a(\mathbf q, \mathbf k) = \mathbf{q}^\top \mathbf{k}  /\sqrt{d}.$$
 
 在实践中，我们通常从小批量的角度来考虑提高效率，
-例如基于$n$个查询和$m$个键－值对计算注意力，
-其中查询和键的长度为$d$，值的长度为$v$。
-查询$\mathbf Q\in\mathbb R^{n\times d}$、
-键$\mathbf K\in\mathbb R^{m\times d}$和
-值$\mathbf V\in\mathbb R^{m\times v}$的缩放点积注意力是：
+例如基于 $n$ 个查询和 $m$ 个键－值对计算注意力，
+其中查询和键的长度为 $d$ ，值的长度为 $v$ 。
+查询 $\mathbf Q\in\mathbb R^{n\times d}$ 、
+键 $\mathbf K\in\mathbb R^{m\times d}$ 和
+值 $\mathbf V\in\mathbb R^{m\times v}$ 的缩放点积注意力是：
 
 $$ \mathrm{softmax}\left(\frac{\mathbf Q \mathbf K^\top }{\sqrt{d}}\right) \mathbf V \in \mathbb{R}^{n\times v}.$$
 
@@ -385,14 +403,14 @@ $$ \mathrm{softmax}\left(\frac{\mathbf Q \mathbf K^\top }{\sqrt{d}}\right) \math
 *子空间表示*（representation subspaces）可能是有益的。
 
 为此，与其只使用单独一个注意力汇聚，
-我们可以用独立学习得到的$h$组不同的
+我们可以用独立学习得到的 $h$ 组不同的
 *线性投影*（linear projections）来变换查询、键和值。
-然后，这$h$组变换后的查询、键和值将并行地送到注意力汇聚中。
-最后，将这$h$个注意力汇聚的输出拼接在一起，
+然后，这 $h$ 组变换后的查询、键和值将并行地送到注意力汇聚中。
+最后，将这 $h$ 个注意力汇聚的输出拼接在一起，
 并且通过另一个可以学习的线性投影进行变换，
 以产生最终输出。
 这种设计被称为*多头注意力*（multihead attention）。
-对于$h$个注意力汇聚输出，每一个注意力汇聚都被称作一个*头*（head）。
+对于 $h$ 个注意力汇聚输出，每一个注意力汇聚都被称作一个*头*（head）。
 下图展示了使用全连接层来实现可学习的线性变换的多头注意力。
 
 ![多头注意力：多个头连结然后线性变换](../img/multi-head-attention.svg)
@@ -400,9 +418,9 @@ $$ \mathrm{softmax}\left(\frac{\mathbf Q \mathbf K^\top }{\sqrt{d}}\right) \math
 ## 数学模型
 
 在实现多头注意力之前，让我们用数学语言将这个模型形式化地描述出来。
-给定查询$\mathbf{q} \in \mathbb{R}^{d_q}$、
-键$\mathbf{k} \in \mathbb{R}^{d_k}$和
-值$\mathbf{v} \in \mathbb{R}^{d_v}$，
+给定查询 $\mathbf{q} \in \mathbb{R}^{d_q}$ 、
+键 $\mathbf{k} \in \mathbb{R}^{d_k}$ 和
+值 $\mathbf{v} \in \mathbb{R}^{d_v}$，
 每个注意力头$\mathbf{h}_i$（$i = 1, \ldots, h$）的计算方法为：
 
 $$\mathbf{h}_i = f(\mathbf W_i^{(q)}\mathbf q, \mathbf W_i^{(k)}\mathbf k,\mathbf W_i^{(v)}\mathbf v) \in \mathbb R^{p_v},$$
@@ -411,14 +429,21 @@ $$\mathbf{h}_i = f(\mathbf W_i^{(q)}\mathbf q, \mathbf W_i^{(k)}\mathbf k,\mathb
 $\mathbf W_i^{(q)}\in\mathbb R^{p_q\times d_q}$、
 $\mathbf W_i^{(k)}\in\mathbb R^{p_k\times d_k}$和
 $\mathbf W_i^{(v)}\in\mathbb R^{p_v\times d_v}$，
-以及代表注意力汇聚的函数$f$。
+以及代表注意力汇聚的函数 $f$ 。
 $f$可以是
 加性注意力和缩放点积注意力。
 多头注意力的输出需要经过另一个线性转换，
-它对应着$h$个头连结后的结果，因此其可学习参数是
+它对应着 $h$ 个头连结后的结果，因此其可学习参数是
 $\mathbf W_o\in\mathbb R^{p_o\times h p_v}$：
 
-$$\mathbf W_o \begin{bmatrix}\mathbf h_1\\\vdots\\\mathbf h_h\end{bmatrix} \in \mathbb{R}^{p_o}.$$
+$$
+\mathbf{W_o} \begin{bmatrix} 
+\mathbf{h_1} \\ 
+\vdots \\ 
+\mathbf{h_h} 
+\end{bmatrix} \in \mathbb{R}^{p_o}
+$$
+
 
 基于这种设计，每个头都可能会关注输入的不同部分，
 可以表示比简单加权平均值更复杂的函数。
@@ -435,14 +460,14 @@ $$\mathbf W_o \begin{bmatrix}\mathbf h_1\\\vdots\\\mathbf h_h\end{bmatrix} \in \
 
 ## [**自注意力**]
 
-给定一个由词元组成的输入序列$\mathbf{x}_1, \ldots, \mathbf{x}_n$，
-其中任意$\mathbf{x}_i \in \mathbb{R}^d$（$1 \leq i \leq n$）。
+给定一个由词元组成的输入序列 $\mathbf{x}_1, \ldots, \mathbf{x}_n$ ，
+其中任意 $\mathbf{x}_i \in \mathbb{R}^d$（$1 \leq i \leq n$） 。
 该序列的自注意力输出为一个长度相同的序列
-$\mathbf{y}_1, \ldots, \mathbf{y}_n$，其中：
+$\mathbf{y}_1, \ldots, \mathbf{y}_n$ ，其中：
 
 $$\mathbf{y}_i = f(\mathbf{x}_i, (\mathbf{x}_1, \mathbf{x}_1), \ldots, (\mathbf{x}_n, \mathbf{x}_n)) \in \mathbb{R}^d$$
 
-根据注意力汇聚函数$f$。
+根据注意力汇聚函数 $f$ 。
 对于一个翻译模型来说，
 query是目标语言的一个词元，
 而keys和values是相同的，都是源语言的所有单词，
@@ -457,11 +482,12 @@ query是目标语言的一个词元，
 位置编码可以通过学习得到也可以直接固定得到。
 接下来描述的是基于正弦函数和余弦函数的固定位置编码
 
-假设输入表示$\mathbf{X} \in \mathbb{R}^{n \times d}$
+假设输入表示 $\mathbf{X} \in \mathbb{R}^{n \times d}$
 包含一个序列中$n$个词元的$d$维嵌入表示。
 位置编码使用相同形状的位置嵌入矩阵
-$\mathbf{P} \in \mathbb{R}^{n \times d}$输出$\mathbf{X} + \mathbf{P}$，
-矩阵第$i$行、第$2j$列和$2j+1$列上的元素为：
+$\mathbf{P} \in \mathbb{R}^{n \times d}$ 输出 
+$\mathbf{X} + \mathbf{P}$ ，
+矩阵第 $i$ 行、第 $2j$ 列和 $2j+1$ 列上的元素为：
 
 $$\begin{aligned} p_{i, 2j} &= \sin\left(\frac{i}{10000^{2j/d}}\right),p_{i, 2j+1} &= \cos\left(\frac{i}{10000^{2j/d}}\right).\end{aligned}$$
 
@@ -505,7 +531,7 @@ $$\begin{aligned} p_{i, 2j} &= \sin\left(\frac{i}{10000^{2j/d}}\right),p_{i, 2j+
 这种投影的数学解释是，令$\omega_j = 1/10000^{2j/d}$，
 对于任何确定的位置偏移$\delta$，
 任何一对
-$(p_{i, 2j}, p_{i, 2j+1})$都可以线性投影到
+$(p_{i, 2j}, p_{i, 2j+1})$ 都可以线性投影到
 $(p_{i+\delta, 2j}, p_{i+\delta, 2j+1})$：
 
 $$\begin{aligned}
@@ -517,7 +543,7 @@ $$\begin{aligned}
 \begin{bmatrix} p_{i+\delta, 2j} \\  p_{i+\delta, 2j+1} \\ \end{bmatrix},
 \end{aligned}$$
 
-$2\times 2$投影矩阵不依赖于任何位置的索引$i$。
+$2\times 2$ 投影矩阵不依赖于任何位置的索引 $i$ 。
 
 # Transformer
 
@@ -527,7 +553,7 @@ Transformer作为编码器－解码器架构的一个实例，其整体架构在
 
 从宏观角度来看，Transformer的编码器是由多个相同的层叠加而成的，每个层都有两个子层（子层表示为$\mathrm{sublayer}$）。第一个子层是*多头自注意力*（multi-head self-attention）汇聚；第二个子层是*基于位置的前馈网络*（positionwise feed-forward network）。具体来说，在计算编码器的自注意力时，查询、键和值都来自前一个编码器层的输出。受残差网络的启发，每个子层都采用了*残差连接*（residual connection）。在Transformer中，对于序列中任何位置的任何输入$\mathbf{x} \in \mathbb{R}^d$，都要求满足$\mathrm{sublayer}(\mathbf{x}) \in \mathbb{R}^d$，以便残差连接满足$\mathbf{x} + \mathrm{sublayer}(\mathbf{x}) \in \mathbb{R}^d$。在残差连接的加法计算之后，紧接着应用*层规范化*（layer normalization）。因此，输入序列对应的每个位置，Transformer编码器都将输出一个$d$维表示向量。
 
-Transformer解码器也是由多个相同的层叠加而成的，并且层中使用了残差连接和层规范化。除了编码器中描述的两个子层之外，解码器还在这两个子层之间插入了第三个子层，称为*编码器－解码器注意力*（encoder-decoder attention）层。在编码器－解码器注意力中，查询来自前一个解码器层的输出，而键和值来自整个编码器的输出。在解码器自注意力中，查询、键和值都来自上一个解码器层的输出。但是，解码器中的每个位置只能考虑该位置之前的所有位置。这种*掩蔽*（masked）注意力保留了*自回归*（auto-regressive）属性，确保预测仅依赖于已生成的输出词元。q
+Transformer解码器也是由多个相同的层叠加而成的，并且层中使用了残差连接和层规范化。除了编码器中描述的两个子层之外，解码器还在这两个子层之间插入了第三个子层，称为*编码器－解码器注意力*（encoder-decoder attention）层。在编码器－解码器注意力中，查询来自前一个解码器层的输出，而键和值来自整个编码器的输出。在解码器自注意力中，查询、键和值都来自上一个解码器层的输出。但是，解码器中的每个位置只能考虑该位置之前的所有位置。这种*掩蔽*（masked）注意力保留了*自回归*（auto-regressive）属性，确保预测仅依赖于已生成的输出词元。
 
 ## [**基于位置的前馈网络**]
 
@@ -584,8 +610,8 @@ X_{\text{normalized}} = \frac{X - \mu}{\sigma}
 $$
 
 其中：
-- $ \mu $ 是该行的均值，
-- $ \sigma $ 是该行的标准差。
+- $\mu$ 是该行的均值，
+- $\sigma$ 是该行的标准差。
 
 我们分别对每一行进行计算。
 
@@ -593,13 +619,13 @@ $$
 
 ### **第一行：[1, 2]** 的计算：
 
-1. **均值** (\( \mu_1 \))：
+1. **均值** ( $\mu_1$ )：
 
 $$
 \mu_1 = \frac{1 + 2}{2} = 1.5
 $$
 
-2. **标准差** (\( \sigma_1 \))：
+2. **标准差** ( $\sigma_1$ )：
 
 $$
 \sigma_1 = \sqrt{\frac{(1 - 1.5)^2 + (2 - 1.5)^2}{2}} = \sqrt{\frac{0.25 + 0.25}{2}} = \sqrt{0.25} = 0.5
@@ -615,13 +641,13 @@ $$
 
 ### **第二行：[2, 3]** 的计算：
 
-1. **均值** (\( \mu_2 \))：
+1. **均值** ( $\mu_2$ )：
 
 $$
 \mu_2 = \frac{2 + 3}{2} = 2.5
 $$
 
-2. **标准差** (\( \sigma_2 \))：
+2. **标准差** ( $\sigma_2$ )：
 
 $$
 \sigma_2 = \sqrt{\frac{(2 - 2.5)^2 + (3 - 2.5)^2}{2}} = \sqrt{\frac{0.25 + 0.25}{2}} = \sqrt{0.25} = 0.5
@@ -637,7 +663,7 @@ $$
 
 ### **最终的标准化结果**
 
-标准化后的矩阵 $ X_{\text{normalized}} $ 为：
+标准化后的矩阵 $X_{\text{normalized}}$ 为：
 
 $$
 X_{\text{normalized}} = \begin{bmatrix}
@@ -664,47 +690,47 @@ $$
    
    多头注意力机制可以通过多个注意力头并行计算，然后将它们的结果拼接起来，最终通过一个线性变换得到输出。多头注意力可以表示为：
 
-   $$ \text{MultiHeadAttention}(Q, K, V) = \text{Concat}(head_1, head_2, \dots, head_h)W^O $$
+   $$\text{MultiHeadAttention}(Q, K, V) = \text{Concat}(head_1, head_2, \dots, head_h)W^O$$
 
    其中，$h$ 是头的数量，$Q, K, V$ 是查询、键、值矩阵，$W^O$ 是输出的线性变换矩阵。每个注意力头的计算如下：
 
-   $$ head_i = \text{Attention}(QW_i^Q, KW_i^K, VW_i^V) $$
+   $$head_i = \text{Attention}(QW_i^Q, KW_i^K, VW_i^V)$$
 
-   其中，$W_i^Q, W_i^K, W_i^V$ 是每个头的参数，$\text{Attention}(Q, K, V)$ 是标准的缩放点积注意力。
+   其中，$W_i^Q$ , $W_i^K$ , $W_i^V$ 是每个头的参数, $\text{Attention}(Q, K, V)$ 是标准的缩放点积注意力。
 
    缩放点积注意力公式为：
 
-   $$ \text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V $$
+   $$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$
 
-   其中，$d_k$ 是键的维度。
+   其中, $d_k$ 是键的维度。
 
 2. **AddNorm 1**：
    
-   对于第一个规范化操作，假设$X$为输入，$\text{MultiHeadAttention}(X, X, X)$为通过多头注意力计算得到的输出，规范化步骤为：
+   对于第一个规范化操作，假设 $X$ 为输入， $\text{MultiHeadAttention}(X, X, X)$ 为通过多头注意力计算得到的输出，规范化步骤为：
 
    $$ Y_1 = \text{AddNorm}(X, \text{MultiHeadAttention}(X, X, X)) $$
 
    这里，`AddNorm` 表示加法和归一化操作。
 
 3. **Feed-Forward Network**：
-   
-   在前馈神经网络中，我们先对输入$Y_1$应用一个全连接层，然后进行非线性激活，最后再经过一个全连接层：
+    
+   在前馈神经网络中，我们先对输入 $Y_1$ 应用一个全连接层，然后进行非线性激活，最后再经过一个全连接层：
 
    $$ \text{FFN}(Y_1) = \text{ReLU}(Y_1W_1 + b_1)W_2 + b_2 $$
 
-   其中，$W_1, W_2$ 是权重矩阵，$b_1, b_2$ 是偏置，$\text{ReLU}$ 是激活函数。
+   其中，$W_1$ , $W_2$ 是权重矩阵，$b_1$ , $b_2$ 是偏置,  $\text{ReLU}$ 是激活函数。
 
 4. **AddNorm 2**：
    
    对于第二个规范化操作，最终输出是：
 
-   $$ Y_2 = \text{AddNorm}(Y_1, \text{FFN}(Y_1)) $$
+   $$Y_2 = \text{AddNorm}(Y_1, \text{FFN}(Y_1))$$
 
 5. **最终输出**：
    
    所以，Encoder Block的输出可以表示为：
 
-   $$ \text{EncoderBlock}(X) = \text{AddNorm}(\text{AddNorm}(X, \text{MultiHeadAttention}(X, X, X)), \text{FFN}(\text{AddNorm}(X, \text{MultiHeadAttention}(X, X, X)))) $$
+   $$\text{EncoderBlock}(X) = \text{AddNorm}(\text{AddNorm}(X, \text{MultiHeadAttention}(X, X, X)), \text{FFN}(\text{AddNorm}(X, \text{MultiHeadAttention}(X, X, X))))$$
 
 ### Transformer 编码器的组成
 
@@ -747,7 +773,7 @@ X & \text{if } state[2][self.i] \text{ is None} \\
 \end{cases}
 $$
 
-**在推理的过程中**$\text{concatenate}$的作用是将当前解码器块（self.i）的输出 state[2][self.i] 和当前时间步的输入 X（查询） 拼接在一起。这意味着，当前解码器块将使用之前生成的解码结果和当前时刻的输入来计算当前时刻的输出。例如，如果$state[2][self.i] = (batch_size, 1, d)$，那么key_values会是X和state[2][self.i]拼接变成形状(batch_size, 2, d)，依旧可以通过复制X（查询）的方式和当前时间步形状为（batch_size, 1,d）的X（查询）进行注意力分数的计算。
+**在推理的过程中** $\text{concatenate}$ 的作用是将当前解码器块（self.i）的输出 state[2][self.i] 和当前时间步的输入 X（查询） 拼接在一起。这意味着，当前解码器块将使用之前生成的解码结果和当前时刻的输入来计算当前时刻的输出。例如，如果 $state[2][self.i] = (batch_size, 1, d)$ ，那么key_values会是X和state[2][self.i]拼接变成形状(batch_size, 2, d)，依旧可以通过复制X（查询）的方式和当前时间步形状为（batch_size, 1,d）的X（查询）进行注意力分数的计算。
 
 ### 2. 生成解码器的有效长度 (`dec_valid_lens`)
 
