@@ -1,5 +1,5 @@
 # Windows 系统深度学习环境配置指南
-## **方法一 Vscode + Anaconda + pip install**
+## **方法一 Vscode + Anaconda （推荐）**
 ### 1. **vscode + python插件**
    下载vscode,下载python插件 ![python](./25_Env_img/python插件.png)
 ### 2. **安装 Anaconda**
@@ -220,8 +220,25 @@ drive.mount('/content/drive/')
 
 你可以通过左侧边的**文件**选项查找到Google Drive中的文件。
 
+
 ### 5. 运行
 
 直接输入代码并运行即可。
 
 如果你只是想简单尝试一下，你也可以跳过步骤3和4，直接运行代码块。
+
+
+---
+参考资料
+
+pycharm安装：https://blog.csdn.net/qq_32892383/article/details/116137730
+
+anaconda安装：https://blog.csdn.net/fan18317517352/article/details/123035625
+
+Pytorch官网： https://pytorch.org
+
+Pytorch仓库：https://github.com/pytorch/pytorch
+
+2024年Deep Learning环境配置文档：  https://github.com/UMJI-SSTIA/DeepLearning-wksp-div.1/blob/main/Environment_setup.md
+
+---
