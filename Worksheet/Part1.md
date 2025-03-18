@@ -86,11 +86,23 @@ kNN 模型无需训练，但设 $N$ 为训练数据集的大小，$d$ 为每个�
 ## 2. 线性分类器 Linear Classifier
 
 我们也可以把每个图片拉成一个 $32\times32\times3=3072$ 维的向量，并想到可以使用矩阵乘法来对这个向量进行线性变换.
-令 $f(x;W)=W\cdot x+b$.$\text{\ \ }$其中，$x$ 是 $3072$ 维的图片向量，$W$ 是 $10\times3072$ 的参数矩阵，$b$ 是一个 $10$ 维向量，代表偏差.$\text{\ \ }$ $W\cdot x$ 的结果是一个 $10$ 维的向量，其中第 $i$ 维的大小代表 $W$ 对 $x$ 属于第 $i$ 个标签的评分.$\text{\ \ }$我们想让正确标签的评分最高.
+令 $f(x;W)=W\cdot x+b$.$\text{\ \ }$其中，$x$ 是 $3072$ 维的图片向量，$W$ 是 $10\times3072$ 的参数矩阵，$b$ 是一个 $10$ 维向量，代表偏差.$\text{\ \ }$ $W\cdot x+b$ 的结果是一个 $10$ 维的向量，其中第 $i$ 维的大小代表 $W$ 对 $x$ 属于第 $i$ 个标签的评分.$\text{\ \ }$我们想让正确标签的评分最高.
+
+学过线性代数的同学们知道，我们可以把 $W\cdot x+b$ 简化为一次矩阵乘法：
+
+$$
+Wx + b =
+\left[ {\begin{array}{cc} W&b \\ \end{array}}\right]
+\left[ {\begin{array}{cc} x \\ 1 \\ \end{array}}\right].
+$$
+
+因此我们在接下来的讨论中把 $b$ 也当成 $W$ 的一部分，省去单独考虑的麻烦.
 
 思考一下这里 $W$ 的意义.$\text{\ \ }$ $W$ 的第 $i$ 行向量似乎对应着第 $i$ 个标签，使得对应标签的图片在与它进行乘积以后能获得最大值.$\text{\ \ }$同时，$W$ 每一行的大小都与图片向量相同，我们可以把 $W$ 的每一行想象成一个模板图片.
 
 ![](../img/Part1/2.png)
+
+但是这样做也有一个问题：一个标签只能对应一个模板. CIFAR-10 的数据集里面有很多标签为 `horst` 的图片，而这些图片里马的朝向有左有右，最后训练出来的 $W$ 中马的模板如图中所示，是一匹模糊的双头马. 感性理解，线性分类器并没有真正学习到马的特征是什么，而是通过大的像素团块的位置比对来进行分类.
 
 ### 2.1 损失函数 Loss Function
 
@@ -165,12 +177,12 @@ $$\frac{d f(x)}{dx}=\lim_{h\rightarrow 0}\frac{f(x+h)-f(x)}{h}$$
 
 1. 我们可以通过稍微给 $W$ 中的每一项增加一个极小值后查看 $L$ 的变化量的方式来得出 $\nabla L_W$ 的数值解，但是当 $W$ 的矩阵大小很大的时候，这样做的效率很低.
 2. 我们也可以手动推导 $L$ 关于 $W$ 中每一项的偏导，但我们每次想要修改我们的算法时都需要重新推式子，这很麻烦.
-3. 我们可以设计一种模块化的，能够通过算式自动得到梯度解析解的算法. 这就是耳熟能详的**反向传递**算法. 有关反向传递算法的更多细节会在后面提到.
+3. 我们可以设计一种模块化的，能够通过算式自动得到梯度解析解的算法. 这就是耳熟能详的 **反向传递 (Back Propagation)** 算法，感兴趣的听众可以自行查阅资料.
 
 我们通过多次迭代的方式从一个随机的起点 $W_0$ 下降到一个局部最优的 $W$.
 
 $$
-\begin{align*}
+\begin{aligned}
 &\text{\textbf{procedure} GradientDescent}(rate, cnt)\\
 &\text{\quad\quad\textbf{initialize }}W\\
 &\text{\quad\quad\textbf{for} }t=1\textbf{ to } cnt:\\
@@ -178,7 +190,7 @@ $$
 &\text{\quad\quad\quad\quad}W:=W-d\cdot rate\\
 &\text{\quad\quad\textbf{end}}\\
 &\text{\textbf{return }}W
-\end{align*}
+\end{aligned}
 $$
 
 在这个过程中，$W$ 的初始化方式、$rate$ 学习速率（步长）以及 $cnt$ 步数都属于需要预先设定好的超参数.
@@ -199,18 +211,67 @@ $$
 
 #### 2.2.4 SGD + 动量方法
 
-#### 2.2.5 RMSProp + 动量方法
+考虑怎么避免这种折线状的梯度下降路线出现. 2.2.3 的示意图中，一个效率很高的梯度下降路线被夹在了黑色的行进路线之间. 有没有一种方法能让下降路线大体维持在梯度附近，但不会被折线状的梯度变化降低效率呢？
+
+在粗糙的平面上有一个小物块，它每秒会获得一个方向不同的加速度，但它的运动轨迹还能维持成平滑的曲线. 新的加速度只会稍微改变物体的动量，并不会直接带着物块沿着加速度的方向直接运动. 运用这个类比，我们改进一下我们的随机梯度下降：
+
+$$
+\begin{aligned}
+&\text{\textbf{procedure} GradientDescent}(rate, cnt, \mu)\\
+&\text{\quad\quad\textbf{initialize }}W\\
+&\text{\quad\quad}v:=0\\
+&\text{\quad\quad\textbf{for} }t=1\textbf{ to } cnt:\\
+&\text{\quad\quad\quad\quad}d:=\nabla_W L(W)\\
+&\text{\quad\quad\quad\quad}v:=\mu\cdot v+d\\
+&\text{\quad\quad\quad\quad}W:=W-v\cdot rate\\
+&\text{\quad\quad\textbf{end}}\\
+&\text{\textbf{return }}W
+\end{aligned}
+$$
+
+在动量方法中，我们新引入了一个超参数 $\mu$，它的作用与平面上的摩擦因数差不多. 当然，这个方法绝非完美. 感兴趣的听众可以自行研究 RMSProp, Adam, Second-Order Optimization 等更优的算法.
 
 ## 3. 神经网络 Neural Networks
 
+既然我们发现用矩阵乘法能够拟合给定的数据集，不妨多加几层试试？令 $f(x;W_1, W_2)=W_2\cdot W_1\cdot x$.$\text{\ \ }$ 此时，我们在梯度优化的时候要同时优化 $W_1$ 和 $W_2$.
+
+但这么做实际上有一个很大的问题：$W_1, W_2$ 都是矩阵，而矩阵乘法具有结合律. 如果我们令 $W=W_1\cdot W_2$，那么这个模型的拟合能力其实没有发生任何变化，我们在优化的时候还耗费了更多的资源.
+
 ### 3.1 激活函数 Activation Function
 
-#### 3.1.1 引入非线性因素
+都是线性的锅！我们要引入非线性因素，破坏掉矩阵乘法的结合律，增强我们模型的拟合能力！
 
-#### 3.1.2 ReLU 函数
+令 $f(x;W_1, W_2)=W_2\cdot \max(0, W_1\cdot x)$. 这里的 $\max(0, \cdot)$ 操作代表把矩阵里的每一项与 $0$ 取最大值. 类似地，我们还可以引入更多层矩阵：$f(x;W_1, W_2, W_3)=W_3\cdot\max(0, W_2\cdot \max(0, W_1\cdot x))$. 
 
-### 3.2 反向传递 Backpropagation
+由于 $W_2$ 的长宽并没有被输入和输出向量的维度框死，我们可以将其放大. 这样，我们就相当于把之前所说 $W$ 每行作为一个模板的限制扩大了：现在一个标签可以对应很多个模板，我们的模型也就有了“学习”一种标签的图片中的多个特征的能力.
 
-## 参考 Reference
+像 $\max(0,\cdot)$ 这样能够给模型引入非线性因素的函数被称为激活函数. $\max(0, \cdot)$ 由于计算速度快，不会在嵌套多层后引发**梯度消失**等优点而被经常使用，赐名 ReLU (Rectified Linear Unit，线性整流函数).
+
+但是由于 ReLU 中存在一个不可导的零点，有时会使用其他函数来替代 ReLU，如 ELU 函数:
+
+$$ELU(x)=\left\{\begin{align*}
+&x &x\geq0\\
+&\alpha(e^x-1) &x<0\\
+\end{align*}\right.$$
+
+另外，由于 ReLU 会抹消掉矩阵中所有小于 $0$ 的项，这可能会导致信息的过快损失. 有时我们也会使用 Leaky ReLU 作为激活函数：
+
+$$Leaky\ ReLU(x)=\max(0.1x, x)$$
+
+### 3.2 感知器 Perceptron
+
+我们不只可以反复地对一个矩阵进行这样的操作：我们还可以把输入的向量用多种途径进行线性变换+非线性激活函数的处理后线性组合在一起.
+
+到此为止，我们从零开始构建出了深度学习的基本单元 —— 感知器 (Perceptron).
+
+![](../img/Part1/3_1.png)
+
+有没有发现它长得很像一个神经元？
+
+## 参考资料 References
 
 Bertolotti, Jacopo. 梯度下降动画. https://twitter.com/j_bertolotti/status/1121054414066810881
+
+Johnson, Justin. UMich EECS-498.
+
+MIT 6.S191. 感知器的构造.
