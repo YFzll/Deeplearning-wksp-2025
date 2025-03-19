@@ -399,9 +399,9 @@ MNIST是经典图像识别的示例，一个手写数字数据集，包含70,000
 ---
 ![](训练CNN.png)
 
-- model = CNN()
+- `model = CNN()`
   1. 创建一个CNN实例
-- criterion = nn.CrossEntropyLoss()
+- `criterion = nn.CrossEntropyLoss()`
   1. 定义损失函数
   2. 说人话：
   - 将模型输出的原始分数转换为概率分布，输出的每个元素表示该类别的概率。
